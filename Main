@@ -1,0 +1,154 @@
+def initialize():
+    global hedons
+    global health_points
+    global tired
+    global uninterrupted_rest_time
+    global bored
+    global last_star
+    global last_star2
+    global last_star3
+    global star_accepted
+    global current_time
+    global star_activity
+    hedons = 0
+    health_points = 0
+    activity = "Resting"
+    tired = False
+    uninterrupted_rest_time = 0
+    bored = False
+    last_star3 = -200
+    last_star2 = -200
+    last_star = -200
+    current_time = 0
+    star_accepted = False
+    star_activity = ""
+    
+def get_cur_hedons():
+    print ("Hedons:" , hedons)
+    print ("Tired:", tired)
+def get_cur_health():
+    print ("Health:" , health_points)
+
+
+def offer_star(activity):
+    global last_star
+    global last_star2
+    global last_star3
+    global star_accepted
+    global current_time
+    global current_activity
+    global star_activity
+    global bored
+    
+    star_activity = activity
+
+    last_star3 = last_star2
+    last_star2 = last_star
+    last_star = current_time
+    
+    if current_time - last_star3 >= 180:
+        bored = False
+    elif current_time - last_star <180:
+        bored = True
+        
+def star_can_be_taken(activity):
+    
+    if activity == star_activity and bored == False:
+        return True
+        star_accepted = True
+    else: 
+        return False
+        
+def most_fun_activity_minute():
+    
+    if tired == False and star_activity == "Running" and bored == False:
+        return "Running"
+    elif tired == False and star_activity == "Textbooks" and bored == False:
+        return "Textbooks"
+    elif tired == False:
+        return "Running"
+    elif tired == True and star_activity == "Running" and bored == False:
+        return "Running"
+    elif tired == True and star_activity == "Textbooks" and bored == False:
+        return "Textbooks"
+    elif tired == True:  
+        return "Resting"
+    
+        
+def perform_activity(activity, duration):
+    global health_points
+    global hedons
+    global uninterrupted_rest_time
+    global tired
+    global star_activity
+    global current_time
+    global star_accepted
+    
+    current_time += duration
+    
+    if activity == "Resting": #turns off tiredness if user has rested
+        uninterrupted_rest_time += duration
+        if uninterrupted_rest_time > 120:
+            tired = False
+    else:
+        uninterrupted_rest_time = 0
+    
+
+    if activity == "Running": #Give health points based on duration, set to tired
+        health_points += min(duration, 180)*3 + max(0, duration - 180)
+        tired = True
+    elif activity == "Textbooks": #Give health points based on duration, set to tired
+        health_points += 2*duration
+        tired = True
+
+    if star_accepted:
+        if tired == False:
+            hedons += min (duration,10)*3
+            if activity == "Running":
+                hedons += min(duration, 10)*2 + max(0, duration - 10)*-2
+                tired = True
+            elif activity == "Textbooks":
+                hedons += min(duration,20)*1 + max(0, duration - 20)*-1
+
+        elif tired == True:
+            if activity == "Running":
+                hedons += min(duration, 10)*2 + max(0, duration - 10)*-2
+                tired = True
+
+            if activity == "Textbooks":
+                hedons += duration
+    else:
+        if tired == False: 
+            if activity == "Running":
+                hedons += min(duration, 10)*2 + max(0, duration - 10)*-2
+                tired = True
+            elif activity == "Textbooks":
+                hedons += min(duration, 20) + max(0, duration - 20)*-1
+
+        elif tired == True: 
+            if activity == "Running":
+                hedons += duration*-2
+                tired = True
+
+            if activity == "Textbooks":
+                hedons += duration*-2
+
+
+if __name__ == '__main__':
+    initialize()
+    perform_activity("Running" , 30)
+    get_cur_hedons() 
+    offer_star("Textbooks")
+    perform_activity("Textbooks", 20)
+    get_cur_health()
+    get_cur_hedons()
+    perform_activity("Resting", 119)
+    get_cur_hedons()
+    perform_activity("Resting", 5)
+    get_cur_hedons()
+    offer_star("Running")
+    perform_activity("Running" , 30)
+    most_fun_activity_minute()
+    
+
+
